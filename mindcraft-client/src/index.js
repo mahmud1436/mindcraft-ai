@@ -1,15 +1,13 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './index.css';  // Import the global CSS
+import './index.css';  // Import your styles
 import App from './App';  // Import the main App component
-import reportWebVitals from './reportWebVitals';
+import { BrowserRouter } from 'react-router-dom';  // Import BrowserRouter for routing
 
+// Render the App component inside BrowserRouter to provide routing context
 ReactDOM.render(
-  <React.StrictMode>
+  <BrowserRouter>
     <App />
-  </React.StrictMode>,
-  document.getElementById('root')  // Root DOM element where the app is rendered
+  </BrowserRouter>,
+  document.getElementById('root')
 );
-
-// Performance monitoring function
-reportWebVitals();

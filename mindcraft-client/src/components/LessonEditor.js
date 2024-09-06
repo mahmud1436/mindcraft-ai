@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ReactQuill from 'react-quill';  // Rich Text Editor
 import 'react-quill/dist/quill.snow.css'; // Quill styles
-import { collection, addDoc } from 'firebase/firestore';
+import { collection, addDoc, getDocs } from 'firebase/firestore';
 import { db } from '../firebase'; // Firestore instance
 
 const LessonEditor = () => {
@@ -11,19 +11,49 @@ const LessonEditor = () => {
   const [options, setOptions] = useState(['', '', '', '']); // MCQ options
   const [correctAnswer, setCorrectAnswer] = useState(0); // Index of correct answer
   const [explanation, setExplanation] = useState(''); // Explanation for the correct answer
+  const [grade, setGrade] = useState(''); // Selected grade
+  const [subject, setSubject] = useState(''); // Selected subject
+  const [availableSubjects, setAvailableSubjects] = useState([]); // List of subjects for selected grade
+
+  // Fetching available subjects based on selected grade (if stored in the database)
+  useEffect(() => {
+    if (grade) {
+      fetchSubjectsForGrade();
+    }
+  }, [grade]);
+
+  const fetchSubjectsForGrade = async () => {
+    try {
+      const subjectCollection = collection(db, 'subjects');
+      const subjectSnapshot = await getDocs(subjectCollection);
+      const subjectsList = subjectSnapshot.docs
+        .map(doc => doc.data())
+        .filter(subject => subject.grade === grade);
+      setAvailableSubjects(subjectsList);
+    } catch (error) {
+      console.error('Error fetching subjects:', error);
+    }
+  };
 
   // Handle saving the lesson to Firestore
   const handleSaveLesson = async () => {
+    if (!grade || !subject) {
+      alert('Please select a grade and a subject.');
+      return;
+    }
+
     try {
       await addDoc(collection(db, 'lessons'), {
         title,
         content, // Save rich content as HTML
+        grade,
+        subject,
         assessment: {
           question,
           options,
           correctAnswer,
-          explanation
-        }
+          explanation,
+        },
       });
       alert('Lesson saved successfully');
       // Reset form after saving
@@ -33,6 +63,8 @@ const LessonEditor = () => {
       setOptions(['', '', '', '']);
       setCorrectAnswer(0);
       setExplanation('');
+      setGrade('');
+      setSubject('');
     } catch (error) {
       console.error('Error saving lesson:', error);
     }
@@ -48,6 +80,43 @@ const LessonEditor = () => {
   return (
     <div>
       <h2>Create a New Lesson</h2>
+      
+      {/* Grade Selection */}
+      <select 
+        value={grade} 
+        onChange={(e) => setGrade(e.target.value)} 
+        style={{ marginBottom: '20px', padding: '10px', width: '100%' }}
+      >
+        <option value="">Select Grade</option>
+        <option value="K">K</option>
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+        <option value="5">5</option>
+        <option value="6">6</option>
+        <option value="7">7</option>
+        <option value="8">8</option>
+        <option value="9">9</option>
+        <option value="10">10</option>
+        <option value="11">11</option>
+        <option value="12">12</option>
+      </select>
+
+      {/* Subject Selection */}
+      <select 
+        value={subject} 
+        onChange={(e) => setSubject(e.target.value)} 
+        style={{ marginBottom: '20px', padding: '10px', width: '100%' }}
+      >
+        <option value="">Select Subject</option>
+        {availableSubjects.map((subject, index) => (
+          <option key={index} value={subject.name}>
+            {subject.name}
+          </option>
+        ))}
+      </select>
+
       {/* Lesson Title Input */}
       <input
         type="text"

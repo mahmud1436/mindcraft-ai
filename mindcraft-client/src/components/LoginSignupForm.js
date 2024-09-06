@@ -48,16 +48,16 @@ const LoginSignupForm = () => {
           // Redirect admin to editor page
           navigate('/editor');
         } else {
-          // Redirect normal users to the courses page
-          navigate('/courses');
+          // Redirect normal users to the grade selection page
+          navigate('/grade-selection');
         }
         alert('Login successful');
       } else {
         // Sign up new user
         await createUserWithEmailAndPassword(auth, email, password);
         alert('Account created successfully');
-        // Redirect new user to courses page
-        navigate('/courses');
+        // Redirect new user to grade selection page after sign-up
+        navigate('/grade-selection');
       }
     } catch (error) {
       alert(`Error: ${error.message}`);

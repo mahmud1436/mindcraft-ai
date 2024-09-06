@@ -30,3 +30,40 @@
   border-left: 1px solid #ccc;
   padding-left: 20px;
 }
+.lesson-card {
+  border: 1px solid #ccc;
+  padding: 20px;
+  margin: 10px;
+  text-align: center;
+  border-radius: 10px;
+}
+
+.lesson-image {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  margin-bottom: 10px;
+}
+
+.lesson-content-section, .assessment-section {
+  padding: 20px;
+}
+
+.lesson-navigation {
+  margin-top: 20px;
+}
+
+.lesson-navigation button {
+  margin-right: 10px;
+}
+
+.assessment-section .options {
+  margin-top: 10px;
+}
+
+.assessment-section .explanation {
+  margin-top: 20px;
+  background-color: #f0f0f0;
+  padding: 10px;
+  border-radius: 5px;
+}

@@ -1,7 +1,9 @@
-import { initializeApp } from 'firebase/app';
-import { getFirestore } from 'firebase/firestore';
-import { getAuth } from 'firebase/auth';
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+import { getFirestore } from "firebase/firestore"; // Import Firestore
+import { getAuth } from "firebase/auth"; // Import Firebase Authentication
 
+// Your web app's Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyAcUOZEMGhuPnxlzhg0RImTed03yVLXNUo",
   authDomain: "mindcraft-ai-f418c.firebaseapp.com",
@@ -12,6 +14,13 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-const app = initializeApp(firebaseConfig);
-export const db = getFirestore(app);
-export const auth = getAuth(app);
+const app = initializeApp(firebaseConfig); // Initialize Firebase
+
+// Initialize Firestore
+const db = getFirestore(app);
+
+// Initialize Firebase Authentication
+const auth = getAuth(app);
+
+// Export the db and auth for use in other parts of the app
+export { db, auth };
