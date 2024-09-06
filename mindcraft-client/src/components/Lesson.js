@@ -1,40 +1,55 @@
-import React from 'react';
-import { useParams } from 'react-router-dom';
-import { unitsData } from './unitsData';
+import React, { useEffect, useState } from 'react';
+import { useParams, Link } from 'react-router-dom';
+import { collection, query, where, getDocs } from 'firebase/firestore';
+import { db } from '../firebase'; // Firebase setup
 
-const LessonsPage = () => {
-  const { grade, subject, unitName } = useParams();
+const Lesson = () => {
+  const { grade, subject } = useParams(); // Get grade and subject from the URL
+  const [lessons, setLessons] = useState([]);
 
-  const unit = unitsData[grade]?.[subject]?.units.find(unit => unit.name === unitName) || {};
-  const lessons = unit.lessons || [];
-  const assessments = unit.assessments || [];
+  // Adjust grade to match the format stored in Firebase (e.g., "Grade1")
+  const formattedGrade = `Grade${grade}`;
+
+  // Fetch lessons from Firebase based on grade and subject
+  useEffect(() => {
+    const fetchLessons = async () => {
+      const q = query(
+        collection(db, 'lessons'),
+        where('grade', '==', formattedGrade), // Adjusted to use formatted grade
+        where('subject', '==', subject)
+      );
+      const querySnapshot = await getDocs(q);
+      const lessonsList = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setLessons(lessonsList);
+    };
+
+    fetchLessons();
+  }, [formattedGrade, subject]);
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center">
-      <h1 className="text-4xl font-bold mb-8">Lessons in {unitName}</h1>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-        {lessons.map((lesson, index) => (
-          <div
-            key={index}
-            className="p-6 bg-white rounded-lg shadow-md hover:bg-indigo-100 cursor-pointer transition duration-300"
-          >
-            <h2 className="text-xl font-bold">{lesson}</h2>
-          </div>
-        ))}
-      </div>
-      <h2 className="text-3xl font-bold mt-8">Assessments</h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mt-4">
-        {assessments.map((assessment, index) => (
-          <div
-            key={index}
-            className="p-6 bg-white rounded-lg shadow-md hover:bg-indigo-100 cursor-pointer transition duration-300"
-          >
-            <h2 className="text-xl font-bold">{assessment}</h2>
-          </div>
-        ))}
-      </div>
+    <div className="max-w-4xl mx-auto p-8 bg-white rounded shadow-lg">
+      <h2 className="text-2xl font-bold mb-4">Lessons in {subject}</h2>
+      {lessons.length > 0 ? (
+        <ul>
+          {lessons.map((lesson) => (
+            <li key={lesson.id} className="mb-4">
+              <Link
+                to={`/lesson/${lesson.id}`}
+                className="text-blue-500 hover:underline"
+              >
+                {lesson.title}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p>No lessons available for this subject and grade.</p>
+      )}
     </div>
   );
 };
 
-export default LessonsPage;
+export default Lesson;

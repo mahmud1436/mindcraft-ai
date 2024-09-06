@@ -45,10 +45,10 @@ const LoginSignupForm = () => {
         await signInWithEmailAndPassword(auth, email, password);
 
         if (email === 'hassan.6x@gmail.com') {
-          // Redirect admin to editor page
+          // Redirect admin to lesson editor page
           navigate('/editor');
         } else {
-          // Redirect normal users to the grade selection page
+          // Redirect normal users to grade selection page
           navigate('/grade-selection');
         }
         alert('Login successful');
@@ -56,7 +56,7 @@ const LoginSignupForm = () => {
         // Sign up new user
         await createUserWithEmailAndPassword(auth, email, password);
         alert('Account created successfully');
-        // Redirect new user to grade selection page after sign-up
+        // Redirect new user to grade selection page
         navigate('/grade-selection');
       }
     } catch (error) {

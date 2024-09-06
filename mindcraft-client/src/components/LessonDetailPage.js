@@ -1,84 +1,76 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '../firebase';
 
 const LessonDetailPage = () => {
-  const { id } = useParams();
-  const [currentPart, setCurrentPart] = useState(0);
-  const [selectedAnswer, setSelectedAnswer] = useState(null);
+  const { id } = useParams(); // Get lesson ID from URL
+  const [lesson, setLesson] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [selectedOption, setSelectedOption] = useState(null);
   const [showExplanation, setShowExplanation] = useState(false);
 
-  // Example lesson content divided into parts (replace with actual lesson data)
-  const lessonContent = [
-    { part: 'Introduction to Algebra', content: 'This is the introduction to Algebra.' },
-    { part: 'Basic Algebra Concepts', content: 'Here we discuss variables and constants.' },
-    { part: 'Algebraic Equations', content: 'Now we talk about algebraic equations and how to solve them.' }
-  ];
+  useEffect(() => {
+    const fetchLesson = async () => {
+      try {
+        const lessonDoc = await getDoc(doc(db, 'lessons', id));
+        if (lessonDoc.exists()) {
+          setLesson(lessonDoc.data());
+        } else {
+          console.error('Lesson not found');
+        }
+        setLoading(false);
+      } catch (error) {
+        console.error('Error fetching lesson details:', error);
+        setLoading(false);
+      }
+    };
 
-  // Example MCQ questions (replace with actual questions)
-  const questions = [
-    {
-      question: "What is the value of x in 2x + 3 = 7?",
-      options: ["2", "3", "4", "5"],
-      correctAnswer: "2",
-      explanation: "To solve 2x + 3 = 7, subtract 3 from both sides, then divide by 2."
-    }
-  ];
+    fetchLesson();
+  }, [id]);
 
-  const handleAnswerSubmit = () => {
+  const handleOptionChange = (index) => {
+    setSelectedOption(index);
+  };
+
+  const handleSubmit = () => {
     setShowExplanation(true);
   };
 
-  const nextPart = () => {
-    if (currentPart < lessonContent.length - 1) {
-      setCurrentPart(currentPart + 1);
-      setShowExplanation(false);
-      setSelectedAnswer(null);
-    }
-  };
-
-  const prevPart = () => {
-    if (currentPart > 0) {
-      setCurrentPart(currentPart - 1);
-      setShowExplanation(false);
-      setSelectedAnswer(null);
-    }
-  };
+  if (loading) {
+    return <div>Loading lesson details...</div>;
+  }
 
   return (
-    <div className="lesson-detail-page">
-      <div className="lesson-content-section" style={{ width: '66%' }}>
-        <h2>{lessonContent[currentPart].part}</h2>
-        <p>{lessonContent[currentPart].content}</p>
-        <div className="lesson-navigation">
-          {currentPart > 0 && <button onClick={prevPart}>Previous</button>}
-          {currentPart < lessonContent.length - 1 && <button onClick={nextPart}>Next</button>}
-        </div>
+    <div className="lesson-detail">
+      <div className="lesson-content" style={{ width: '65%', float: 'left' }}>
+        <h2>{lesson.title}</h2>
+        <div dangerouslySetInnerHTML={{ __html: lesson.content }} />
       </div>
-
-      <div className="assessment-section" style={{ width: '33%' }}>
+      <div className="lesson-assessment" style={{ width: '35%', float: 'right' }}>
         <h3>Formative Assessment</h3>
-        <p>{questions[currentPart].question}</p>
-        <div className="options">
-          {questions[currentPart].options.map((option, index) => (
-            <div key={index}>
-              <input
-                type="radio"
-                id={`option-${index}`}
-                name="mcq"
-                value={option}
-                onChange={() => setSelectedAnswer(option)}
-                checked={selectedAnswer === option}
-              />
-              <label htmlFor={`option-${index}`}>{option}</label>
-            </div>
-          ))}
-        </div>
-        <button onClick={handleAnswerSubmit}>Submit</button>
-
+        <p>{lesson.assessment.question}</p>
+        {lesson.assessment.options.map((option, index) => (
+          <div key={index}>
+            <input
+              type="radio"
+              name="option"
+              value={index}
+              checked={selectedOption === index}
+              onChange={() => handleOptionChange(index)}
+            />
+            <label>{option}</label>
+          </div>
+        ))}
+        <button onClick={handleSubmit}>Submit</button>
         {showExplanation && (
-          <div className="explanation">
-            <p>{selectedAnswer === questions[currentPart].correctAnswer ? "Correct!" : "Incorrect"}</p>
-            <p>{questions[currentPart].explanation}</p>
+          <div>
+            <p>
+              {selectedOption === lesson.assessment.correctAnswer
+                ? 'Correct Answer!'
+                : 'Incorrect Answer.'}
+            </p>
+            <p>Explanation: {lesson.assessment.explanation}</p>
           </div>
         )}
       </div>
