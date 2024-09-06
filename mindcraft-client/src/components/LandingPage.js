@@ -85,9 +85,10 @@ const LandingPage = () => {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             className="bg-indigo-600 text-white font-bold py-3 px-8 rounded-full hover:bg-indigo-700 transition duration-300"
-          >
-            <Link to="/login">Login</Link>
-          </motion.button>
+            >
+            <Link to="/login">Login</Link> {/* Link to the login page */}
+            </motion.button>
+            
         </section>
 
         {/* Our Features Section */}
