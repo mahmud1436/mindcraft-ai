@@ -1,24 +1,29 @@
-import logo from './logo.svg';
-import './App.css';
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Navbar from './components/Navbar';  // If applicable
+import Signup from './components/Signup';
+import Login from './components/Login';
+import Courses from './components/Courses';
+import CourseDetail from './components/CourseDetail';
+import Lesson from './components/Lesson';
+import LessonEditor from './components/LessonEditor';
+import ProtectedRoute from './components/ProtectedRoute';
+import LandingPage from './components/LandingPage';  // Import Landing Page component
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <Routes>
+        {/* Set LandingPage as the default page */}
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/courses" element={<ProtectedRoute><Courses /></ProtectedRoute>} />
+        <Route path="/courses/:id" element={<ProtectedRoute><CourseDetail /></ProtectedRoute>} />
+        <Route path="/lesson/:id" element={<ProtectedRoute><Lesson /></ProtectedRoute>} />
+        <Route path="/editor" element={<ProtectedRoute adminOnly={true}><LessonEditor /></ProtectedRoute>} />
+      </Routes>
+    </Router>
   );
 }
 
