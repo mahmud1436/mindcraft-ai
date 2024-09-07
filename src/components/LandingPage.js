@@ -4,13 +4,12 @@ import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 
 const LandingPage = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeFeature, setActiveFeature] = useState(null);
 
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth > 768) {
-        setIsMenuOpen(false);
+        setActiveFeature(null);
       }
     };
 
@@ -27,40 +26,6 @@ const LandingPage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-100 to-indigo-200">
-      <header className="bg-white shadow-md">
-        <nav className="container mx-auto px-6 py-3">
-          <div className="flex items-center justify-between">
-            <div className="text-2xl font-bold text-indigo-600">EduTechIndia</div>
-            <div className="hidden md:flex space-x-4">
-              <a href="#" className="text-gray-800 hover:text-indigo-600 transition duration-300">Home</a>
-              <a href="#" className="text-gray-800 hover:text-indigo-600 transition duration-300">Courses</a>
-              <a href="#" className="text-gray-800 hover:text-indigo-600 transition duration-300">About</a>
-              <a href="#" className="text-gray-800 hover:text-indigo-600 transition duration-300">Contact</a>
-            </div>
-            <button
-              className="md:hidden focus:outline-none"
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              aria-label="Toggle menu"
-            >
-              <svg className="h-6 w-6 fill-current text-gray-800" viewBox="0 0 24 24">
-                {isMenuOpen ? (
-                  <path fillRule="evenodd" clipRule="evenodd" d="M18.278 16.864a1 1 0 0 1-1.414 1.414l-4.829-4.828-4.828 4.828a1 1 0 0 1-1.414-1.414l4.828-4.829-4.828-4.828a1 1 0 0 1 1.414-1.414l4.829 4.828 4.828-4.828a1 1 0 1 1 1.414 1.414l-4.828 4.829 4.828 4.828z" />
-                ) : (
-                  <path fillRule="evenodd" d="M4 5h16a1 1 0 0 1 0 2H4a1 1 0 1 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 1 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 1 1 0-2z" />
-                )}
-              </svg>
-            </button>
-          </div>
-        </nav>
-        {isMenuOpen && (
-          <div className="md:hidden bg-white px-2 pt-2 pb-4 space-y-1 sm:px-3">
-            <a href="#" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-indigo-600 hover:bg-gray-50">Home</a>
-            <a href="#" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-indigo-600 hover:bg-gray-50">Courses</a>
-            <a href="#" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-indigo-600 hover:bg-gray-50">About</a>
-            <a href="#" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-indigo-600 hover:bg-gray-50">Contact</a>
-          </div>
-        )}
-      </header>
 
       <main>
         {/* Hero Section */}
@@ -85,10 +50,9 @@ const LandingPage = () => {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             className="bg-indigo-600 text-white font-bold py-3 px-8 rounded-full hover:bg-indigo-700 transition duration-300"
-            >
-            <Link to="/login">Login</Link> {/* Link to the login page */}
-            </motion.button>
-            
+          >
+            <Link to="/login">Get Started</Link> {/* Link to the login page */}
+          </motion.button>
         </section>
 
         {/* Our Features Section */}

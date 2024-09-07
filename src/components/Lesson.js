@@ -1,53 +1,74 @@
-import React, { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { collection, query, where, getDocs } from 'firebase/firestore';
-import { db } from '../firebase'; // Firebase setup
+import { db } from '../firebase';  // Firestore instance
 
 const Lesson = () => {
-  const { grade, subject } = useParams(); // Get grade and subject from the URL
+  const { grade, subject } = useParams(); // Get grade and subject from URL
   const [lessons, setLessons] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
-  // Adjust grade to match the format stored in Firebase (e.g., "Grade1")
-  const formattedGrade = `Grade${grade}`;
-
-  // Fetch lessons from Firebase based on grade and subject
+  // Fetch lessons from Firestore based on grade and subject
   useEffect(() => {
     const fetchLessons = async () => {
-      const q = query(
-        collection(db, 'lessons'),
-        where('grade', '==', formattedGrade), // Adjusted to use formatted grade
-        where('subject', '==', subject)
-      );
-      const querySnapshot = await getDocs(q);
-      const lessonsList = querySnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-      setLessons(lessonsList);
+      try {
+        const lessonsQuery = query(
+          collection(db, 'lessons'),
+          where('grade', '==', grade),
+          where('subject', '==', subject)
+        );
+        const querySnapshot = await getDocs(lessonsQuery);  // Changed to lessonsQuery
+        const fetchedLessons = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+
+        if (fetchedLessons.length === 0) {
+          console.log('No lessons available for this subject and grade.');
+        }
+
+        setLessons(fetchedLessons);
+        setLoading(false);
+      } catch (error) {
+        console.error('Error fetching lessons:', error);
+        setLoading(false);
+      }
     };
 
     fetchLessons();
-  }, [formattedGrade, subject]);
+  }, [grade, subject]);
+
+  if (loading) {
+    return <div className="flex justify-center items-center h-screen text-xl text-gray-700">Loading lessons...</div>;
+  }
+
+  if (lessons.length === 0) {
+    return <div className="flex justify-center items-center h-screen text-xl text-gray-700">No lessons available for this subject and grade.</div>;
+  }
+
+  // Navigate to lesson detail page
+  const handleLessonClick = (lessonId) => {
+    navigate(`/lesson/${lessonId}`);
+  };
 
   return (
-    <div className="max-w-4xl mx-auto p-8 bg-white rounded shadow-lg">
-      <h2 className="text-2xl font-bold mb-4">Lessons in {subject}</h2>
-      {lessons.length > 0 ? (
+    <div className="min-h-screen bg-gray-100 py-10">
+      <div className="max-w-6xl mx-auto p-6 bg-white rounded-lg shadow-lg">
+        <h1 className="text-3xl font-bold mb-6">Lessons in {subject} (Grade {grade})</h1>
         <ul>
           {lessons.map((lesson) => (
-            <li key={lesson.id} className="mb-4">
-              <Link
-                to={`/lesson/${lesson.id}`}
-                className="text-blue-500 hover:underline"
-              >
-                {lesson.title}
-              </Link>
+            <li
+              key={lesson.id}
+              className="p-4 mb-4 bg-white rounded-lg shadow cursor-pointer hover:bg-indigo-100"
+              onClick={() => handleLessonClick(lesson.id)}
+            >
+              <h2 className="text-xl font-semibold">{lesson.title}</h2>
+              <p>{lesson.subject} - Grade {lesson.grade}</p>
             </li>
           ))}
         </ul>
-      ) : (
-        <p>No lessons available for this subject and grade.</p>
-      )}
+      </div>
     </div>
   );
 };
